@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import BST from './BST';
 
 class App extends Component {
   constructor(props){
@@ -43,7 +44,7 @@ class App extends Component {
     });
     const foundVal = this.binarySearch(data, this.state.searchFor);
     console.log(foundVal);
-    if(foundVal){
+    if(foundVal !== -1){
       this.setState({output: `Found ${foundVal}, Took ${this.state.count} Searches`});
       this.setState({count: 0});            
     } else {
@@ -52,15 +53,12 @@ class App extends Component {
   }
 
   binarySearch(sorted, value, start, end) {
-
     let startPoint = start === undefined ? 0 : start;
     let endPoint = end === undefined ? sorted.length : end;
-    
 
     if (startPoint > endPoint) {
       return -1;
     }
-
     const index = Math.floor((startPoint + endPoint) / 2);
     const item = sorted[index];
 
@@ -79,7 +77,7 @@ class App extends Component {
   }
 
   handleChange(e) {
-    let data = e.target.value.split(' ').map(str => {
+    let data = e.target.value.trim().split(' ').map(str => {
       return parseInt(str, 10);
     });
     this.setState({data: data});
@@ -88,7 +86,16 @@ class App extends Component {
   handleNumberChange(e) {
     this.setState({searchFor: parseInt(e.target.value, 10)});    
   }
+  
+  createBST(){
+    const bst = new BST();
+    for(let i = 0; i < this.state.data.length; i++){
+      bst.insert(this.state.data[i], '');
+    }
+    return bst;
+  }
 
+  // Determines which submit button was used and executes appropriate function
   onFormSubmit(e) {
     e.preventDefault();
     if(this.state.whichBtn === 'linear'){
@@ -97,13 +104,35 @@ class App extends Component {
       this.handleBinarySearch(this.state.data);
     }else if (this.state.whichBtn === 'random'){
       const index = Math.floor(Math.random()*this.state.data.length);
-      console.log(index);
       this.setState({searchFor: this.state.data[index]})
+    } else if(this.state.whichBtn === 'pre-order'){
+      const bst = this.createBST();
+      let arr = [];
+      bst.preOrder(arr);
+      if(arr.length > 20){
+        arr = `${arr.splice(0,9)}, ... ${arr.splice(arr.length-10)}`;
+      }
+      this.setState({output: `Created Array: ${arr}`});
+    } else if(this.state.whichBtn === 'in-order'){
+      const bst = this.createBST();
+      let arr = [];
+      bst.inOrder(arr);
+      if(arr.length > 20){
+        arr = `${arr.splice(0,9)}, ... ${arr.splice(arr.length-10)}`;
+      }
+      this.setState({output: `Created Array: ${arr}`});
+    } else if(this.state.whichBtn === 'post-order'){
+      const bst = this.createBST();
+      let arr = [];
+      bst.postOrder(arr);
+      if(arr.length > 20){
+        arr = `${arr.splice(0,9)}, ... ${arr.splice(arr.length-10)}`;
+      }
+      this.setState({output: `Created Array: ${arr}`});
     }
   }
   
   render() {
-    console.log('this ran', this.binarySearch(this.state.data));
 
     return (
       <form className="App" onSubmit={(event) => 
@@ -122,6 +151,15 @@ class App extends Component {
 
         <button type="submit" name="binary_search_btn" 
           onClick={() => this.setState({whichBtn: 'binary'})}>Binary Search</button>
+
+        <button type="submit" name="pre_order_traversal_btn" 
+          onClick={() => this.setState({whichBtn: 'pre-order'})}>Pre Order Traversal</button>
+
+        <button type="submit" name="in_order_traversal_btn" 
+          onClick={() => this.setState({whichBtn: 'in-order'})}>In Order Traversal</button>
+
+        <button type="submit" name="post_order_traversal_btn" 
+          onClick={() => this.setState({whichBtn: 'post-order'})}>Post Order Traversal</button>  
 
         <p>Output: {this.state.output}</p>
       </form>
